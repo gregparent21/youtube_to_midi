@@ -143,9 +143,16 @@ def convert_to_midi(job_id: str, body: ConvertRequest):
             detail=result.stderr.decode(errors="replace"),
         )
 
-    midi_files = list(midi_dir.glob("*.mid"))
+    stem_name = Path(stem.file_path).stem
+    midi_files = list(midi_dir.glob(f"{stem_name}_basic_pitch.mid"))
     if not midi_files:
-        raise HTTPException(status_code=500, detail="basic-pitch ran but produced no .mid file")
+        # Fall back to any .mid if the naming convention changed
+        midi_files = list(midi_dir.glob("*.mid"))
+    if not midi_files:
+        raise HTTPException(
+            status_code=500,
+            detail="basic-pitch ran but produced no .mid file"
+        )
 
     midi_path = str(midi_files[0])
     db.record_midi(job_id, body.stem_id, midi_path, stem.file_path)
