@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from .. import db
-from ..pipeline import run_job
+from ..pipeline import run_job, _get_base_dir
 
 router = APIRouter()
 
@@ -38,7 +38,7 @@ def get_splitters():
 def create_job(body: JobCreate):
     final_name = body.name
     counter = 2
-    while (BASE_DIR / final_name).exists():
+    while (_get_base_dir(BASE_DIR) / final_name).exists():
         final_name = f"{body.name}-{counter}"
         counter += 1
 
@@ -46,7 +46,7 @@ def create_job(body: JobCreate):
 
     t = threading.Thread(
         target=run_job,
-        args=(job_id, body.url, final_name, body.splitters, body.speed, BASE_DIR),
+        args=(job_id, body.url, final_name, body.splitters, body.speed, _get_base_dir(BASE_DIR)),
         daemon=True,
     )
     t.start()

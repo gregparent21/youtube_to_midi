@@ -5,6 +5,17 @@ from pathlib import Path
 
 from . import db, splitters
 
+_base_dir_override = None
+
+
+def set_base_dir(path):
+    global _base_dir_override
+    _base_dir_override = Path(path) if path else None
+
+
+def _get_base_dir(default: Path) -> Path:
+    return _base_dir_override or default
+
 # (slow_filters, restore_filters) for each speed preset
 SPEED_FILTERS = {
     0.25: (["atempo=0.5", "atempo=0.5"], ["atempo=2.0", "atempo=2.0"]),
@@ -74,7 +85,8 @@ def _restore_speed(stems: dict, speed: float):
 
 
 def run_job(job_id, url, name, splitters_list, speed, base_dir: Path):
-    work_dir = base_dir / name
+    effective_base = _get_base_dir(base_dir)
+    work_dir = effective_base / name
     work_dir.mkdir(exist_ok=True)
     audio_path = work_dir / "input.wav"
 
