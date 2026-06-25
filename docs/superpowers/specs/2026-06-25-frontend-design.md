@@ -94,7 +94,7 @@ CREATE TABLE stems (
 Each job runs in a `threading.Thread`. Steps execute in this order:
 
 1. **Download** — `yt-dlp` extracts audio as `input.wav`
-2. **Time-stretch** (skipped if speed = 1.0) — `ffmpeg atempo` slows audio to preset; no pitch shift
+2. **Time-stretch** (skipped if speed = 1.0) — `ffmpeg atempo` slows audio to preset; no pitch shift. Note: `atempo` accepts 0.5–2.0 only, so 0.25x requires chaining: `atempo=0.5,atempo=0.5`
 3. **Stem separation** — selected splitters run in parallel sub-threads
 4. **Restore speed** (skipped if speed = 1.0) — `ffmpeg atempo` restores all stems to 1x
 
