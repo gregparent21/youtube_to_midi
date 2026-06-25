@@ -117,7 +117,7 @@ def get_job(job_id):
         stems = [
             Stem(id=r["id"], job_id=r["job_id"], splitter=r["splitter"],
                  stem_type=r["stem_type"], file_path=r["file_path"])
-            for r in conn.execute("SELECT * FROM stems WHERE job_id=?", (job_id,))
+            for r in conn.execute("SELECT * FROM stems WHERE job_id=? ORDER BY id", (job_id,))
         ]
         return _row_to_job(row, steps, stems)
 
