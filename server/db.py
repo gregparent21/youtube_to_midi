@@ -28,13 +28,16 @@ def _conn():
     try:
         yield conn
         conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         conn.close()
 
 
 def init_db():
     with _conn() as conn:
-        conn.executescript("""
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS jobs (
                 id         TEXT PRIMARY KEY,
                 name       TEXT NOT NULL,
@@ -43,27 +46,33 @@ def init_db():
                 splitters  TEXT NOT NULL,
                 status     TEXT NOT NULL DEFAULT 'pending',
                 created_at TEXT NOT NULL
-            );
+            )
+        """)
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS steps (
                 id       INTEGER PRIMARY KEY AUTOINCREMENT,
                 job_id   TEXT NOT NULL,
                 label    TEXT NOT NULL,
                 status   TEXT NOT NULL DEFAULT 'pending',
                 error    TEXT
-            );
+            )
+        """)
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS stems (
                 id        INTEGER PRIMARY KEY AUTOINCREMENT,
                 job_id    TEXT NOT NULL,
                 splitter  TEXT NOT NULL,
                 stem_type TEXT NOT NULL,
                 file_path TEXT NOT NULL
-            );
+            )
+        """)
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS midi_outputs (
                 job_id    TEXT PRIMARY KEY,
                 stem_id   INTEGER NOT NULL,
                 midi_path TEXT NOT NULL,
                 stem_path TEXT NOT NULL
-            );
+            )
         """)
 
 
@@ -165,7 +174,7 @@ def record_stem(job_id, splitter, stem_type, file_path):
 def get_stems(job_id):
     with _conn() as conn:
         rows = conn.execute(
-            "SELECT * FROM stems WHERE job_id=?", (job_id,)
+            "SELECT * FROM stems WHERE job_id=? ORDER BY id", (job_id,)
         ).fetchall()
         return [
             Stem(id=r["id"], job_id=r["job_id"], splitter=r["splitter"],
