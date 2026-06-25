@@ -74,6 +74,8 @@
               :disabled="!form.url || !form.name || form.splitters.length === 0">
         Run Pipeline
       </button>
+
+      <div x-show="convertError" style="color: #f87171; margin-top: 12px;" x-text="convertError"></div>
     </div>
 
     <!-- Progress view -->

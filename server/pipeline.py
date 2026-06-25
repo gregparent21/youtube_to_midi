@@ -80,8 +80,9 @@ def _restore_speed(stems: dict, speed: float):
             "-filter:a", filter_str,
             str(tmp),
         ])
-        if tmp.exists():
-            tmp.replace(stem_path)
+        if not tmp.exists():
+            raise RuntimeError(f"ffmpeg restore produced no output for {stem_path}")
+        tmp.replace(stem_path)
 
 
 def run_job(job_id, url, name, splitters_list, speed, base_dir: Path):
@@ -103,6 +104,8 @@ def run_job(job_id, url, name, splitters_list, speed, base_dir: Path):
     try:
         mark("Downloading", "running")
         _download(url, audio_path)
+        if not audio_path.exists():
+            raise RuntimeError(f"Expected audio file not found after download: {audio_path}")
         mark("Downloading", "completed")
 
         active_audio = audio_path

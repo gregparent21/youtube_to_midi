@@ -48,8 +48,14 @@ def test_time_stretch_025x_chains_two_filters(tmp_path):
 def test_restore_speed_calls_ffmpeg(tmp_path):
     stem = tmp_path / "vocals.wav"
     stem.touch()
-    with patch("subprocess.run") as mock_run:
-        mock_run.return_value = MagicMock(returncode=0, stderr=b"")
+
+    def fake_run(cmd, **kwargs):
+        # Simulate ffmpeg creating the restore temp file
+        tmp_file = tmp_path / f"_restore_{stem.name}"
+        tmp_file.touch()
+        return MagicMock(returncode=0, stderr=b"")
+
+    with patch("subprocess.run", side_effect=fake_run) as mock_run:
         pipeline._restore_speed({"vocals": stem}, 0.5)
     cmd = " ".join(mock_run.call_args[0][0])
     assert "atempo=2.0" in cmd

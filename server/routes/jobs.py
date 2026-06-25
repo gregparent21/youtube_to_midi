@@ -6,7 +6,7 @@ import subprocess
 import threading
 from pathlib import Path
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from sse_starlette.sse import EventSourceResponse
 
 from .. import db
@@ -28,6 +28,25 @@ class JobCreate(BaseModel):
     name: str
     splitters: list
     speed: float = 1.0
+
+    @field_validator('speed')
+    @classmethod
+    def speed_must_be_preset(cls, v):
+        valid = {0.25, 0.5, 0.75, 1.0}
+        if v not in valid:
+            raise ValueError(f"speed must be one of {sorted(valid)}")
+        return v
+
+    @field_validator('splitters')
+    @classmethod
+    def splitters_must_be_known(cls, v):
+        known = {"demucs", "spleeter", "audio-separator"}
+        unknown = set(v) - known
+        if unknown:
+            raise ValueError(f"unknown splitters: {unknown}")
+        if not v:
+            raise ValueError("at least one splitter must be selected")
+        return v
 
 
 @router.get("/splitters")
@@ -91,9 +110,15 @@ async def job_events(job_id: str):
 
     async def generate():
         seen = {}
-        while True:
+        max_polls = 7200  # 1 hour at 0.5s intervals
+        polls = 0
+        while polls < max_polls:
+            polls += 1
             steps = db.get_steps(job_id)
             job = db.get_job(job_id)
+            if job is None:
+                yield {"data": json_lib.dumps({"type": "done", "status": "failed", "error": "Job not found"})}
+                return
             for step in steps:
                 if seen.get(step.id) != step.status:
                     seen[step.id] = step.status
@@ -106,7 +131,7 @@ async def job_events(job_id: str):
                             "error": step.error,
                         })
                     }
-            if job and job.status in ("completed", "failed"):
+            if job.status in ("completed", "failed"):
                 yield {"data": json_lib.dumps({"type": "done", "status": job.status})}
                 return
             await asyncio.sleep(0.5)
@@ -129,9 +154,23 @@ def convert_to_midi(job_id: str, body: ConvertRequest):
     if not stem:
         raise HTTPException(status_code=404, detail="Stem not found")
 
-    stem_path = Path(stem.file_path)
-    midi_dir = stem_path.parent.parent.parent / "midi_output"
-    midi_dir.mkdir(exist_ok=True)
+    stem_path_obj = Path(stem.file_path)
+    # The stem is always under work_dir/separated/<splitter>/...
+    # Walk up from stem_path to find the "separated" directory, then work_dir is its parent
+    parts = stem_path_obj.parts
+    sep_idx = None
+    for i, part in enumerate(parts):
+        if part == "separated":
+            sep_idx = i
+            break
+    if sep_idx is not None:
+        work_dir_path = Path(*parts[:sep_idx])
+    else:
+        # fallback: original traversal
+        work_dir_path = stem_path_obj.parent.parent.parent
+    midi_dir = work_dir_path / "midi_output"
+    midi_dir.mkdir(parents=True, exist_ok=True)
+    stem_path = stem_path_obj
 
     result = subprocess.run(
         ["basic-pitch", str(midi_dir), str(stem_path)],

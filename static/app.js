@@ -136,6 +136,7 @@ function appRoot() {
     newJob() {
       this.activeJobId = null;
       this.activeView = 'form';
+      this.convertError = null;
       if (this._evtSource) { this._evtSource.close(); this._evtSource = null; }
     },
 
@@ -187,6 +188,11 @@ function appRoot() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.form),
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: 'Unknown error' }));
+        this.convertError = err.detail || 'Failed to start job';
+        return;
+      }
       const job = await res.json();
       await this.loadJobs();
       this.activeJobId = job.id;
