@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube to MIDI</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="/static/app.js"></script>
+</head>
+<body x-data="appRoot()" x-init="init()">
+
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div id="sidebar-header">
+      <button @click="newJob()">+ New Job</button>
+    </div>
+    <div id="job-list">
+      <template x-for="job in jobs" :key="job.id">
+        <div class="job-item" :class="{ active: job.id === activeJobId }"
+             @click="selectJob(job)">
+          <span class="job-name" x-text="job.name"></span>
+          <span class="status-icon" x-text="statusIcon(job.status)"></span>
+        </div>
+      </template>
+    </div>
+  </aside>
+
+  <!-- Main panel -->
+  <main id="main">
+
+    <!-- Form view -->
+    <div x-show="activeView === 'form'">
+      <h2>New Job</h2>
+
+      <div class="form-group">
+        <label>YouTube URL</label>
+        <input type="url" x-model="form.url" placeholder="https://youtube.com/watch?v=...">
+      </div>
+
+      <div class="form-group">
+        <label>Song name (used as folder name)</label>
+        <input type="text" x-model="form.name" placeholder="my-song">
+      </div>
+
+      <div class="form-group">
+        <label>Stem splitters</label>
+        <div class="splitter-options">
+          <template x-for="spl in availableSplitters" :key="spl.name">
+            <label :class="{ disabled: !spl.available }"
+                   :title="spl.available ? '' : spl.name + ' is not installed'">
+              <input type="checkbox" :value="spl.name" x-model="form.splitters"
+                     :disabled="!spl.available">
+              <span x-text="spl.label"></span>
+            </label>
+          </template>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Speed preset before splitting</label>
+        <div class="speed-options">
+          <template x-for="speed in [0.25, 0.5, 0.75, 1.0]" :key="speed">
+            <label>
+              <input type="radio" :value="speed" x-model.number="form.speed">
+              <span x-text="speed === 1.0 ? '1x (original)' : speed + 'x'"></span>
+            </label>
+          </template>
+        </div>
+      </div>
+
+      <button class="btn-primary"
+              @click="submitJob()"
+              :disabled="!form.url || !form.name || form.splitters.length === 0">
+        Run Pipeline
+      </button>
+    </div>
+
+    <!-- Progress view -->
+    <div x-show="activeView === 'progress'">
+      <h2>Pipeline Progress</h2>
+      <ul class="step-list">
+        <template x-for="step in steps" :key="step.id">
+          <li class="step-item">
+            <span class="step-icon" x-text="stepIcon(step.status)"></span>
+            <div>
+              <span x-text="step.label"></span>
+              <div x-show="step.error" class="step-error"
+                   x-text="step.error"></div>
+            </div>
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <!-- Stem browser view -->
+    <div x-show="activeView === 'stems'">
+      <h2>Choose a Stem</h2>
+
+      <template x-for="stemType in orderedStemTypes()" :key="stemType">
+        <div class="stem-section">
+          <h3 x-text="stemType"></h3>
+          <template x-for="row in stems[stemType]" :key="row.splitter + ':' + row.stemType">
+            <div class="stem-row" :class="{ 'selected-stem': $store.player.activeStemKey === row.splitter + ':' + row.stemType }">
+
+              <!-- Hidden audio element -->
+              <audio
+                :id="'audio-' + row.splitter + '-' + row.stemType"
+                :src="row.fileUrl"
+                x-init="$store.player.register(row.splitter + ':' + row.stemType, $el)"
+                @timeupdate="$store.player.onTimeUpdate(row.splitter + ':' + row.stemType, $el.currentTime)"
+                @loadedmetadata="$store.player.onMetadata($el.duration)"
+                preload="metadata">
+              </audio>
+
+              <span class="splitter-label" x-text="row.splitter"></span>
+
+              <button @click="$store.player.toggle(row.splitter + ':' + row.stemType)"
+                      :title="($store.player.activeStemKey === row.splitter + ':' + row.stemType && !$store.player.paused) ? 'Pause' : 'Play'">
+                <span x-text="($store.player.activeStemKey === row.splitter + ':' + row.stemType && !$store.player.paused) ? '⏸' : '▶'"></span>
+              </button>
+
+              <span class="time-display"
+                    x-text="$store.player.activeStemKey === row.splitter + ':' + row.stemType
+                            ? $store.player.formatTime($store.player.playhead)
+                            : '0:00'">
+              </span>
+
+              <button class="pick-btn"
+                      @click="convertToMidi(row.id)"
+                      :disabled="converting">
+                <span x-text="converting ? '…' : 'Convert to MIDI'"></span>
+              </button>
+
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <!-- Error from conversion attempt -->
+      <div x-show="convertError" style="color: #f87171; margin-top: 12px;" x-text="convertError"></div>
+
+      <!-- Global scrubber -->
+      <div id="scrubber-bar">
+        <input type="range" min="0"
+               :max="$store.player.duration || 100"
+               :value="$store.player.playhead"
+               step="0.1"
+               @input="$store.player.seek($event.target.value)">
+        <div class="scrubber-times">
+          <span x-text="$store.player.formatTime($store.player.playhead)"></span>
+          <span x-text="$store.player.formatTime($store.player.duration)"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDI download view -->
+    <div x-show="activeView === 'midi'">
+      <h2>MIDI Ready</h2>
+      <p style="color: #aaa; font-size: 14px; margin-bottom: 16px;">
+        Basic Pitch conversion complete. Download your files below.
+      </p>
+      <div class="download-links">
+        <a :href="midiInfo ? '/audio/midi/' + midiInfo.jobId : '#'"
+           class="dl-midi" download>
+          ⬇ Download MIDI (.mid)
+        </a>
+        <a :href="midiInfo && midiInfo.stemId ? '/audio/stem/' + midiInfo.stemId : '#'"
+           class="dl-wav" download>
+          ⬇ Download Stem WAV
+        </a>
+      </div>
+      <div style="margin-top: 32px;">
+        <button class="btn-primary" @click="activeView = 'stems'">← Back to stems</button>
+      </div>
+    </div>
+
+  </main>
+</body>
+</html>
