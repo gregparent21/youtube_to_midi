@@ -64,8 +64,7 @@ def test_run_spleeter_success(tmp_path):
         mock_run.return_value = MagicMock(returncode=0, stderr=b"")
         result = run_spleeter(audio, tmp_path)
 
-    assert "vocals" in result
-    assert "drums" in result
+    assert set(result.keys()) == {"vocals", "drums", "bass", "other"}
 
 
 def test_run_audio_separator_success(tmp_path):
@@ -80,3 +79,12 @@ def test_run_audio_separator_success(tmp_path):
 
     assert "vocals" in result
     assert "other" in result
+
+
+def test_run_audio_separator_failure(tmp_path):
+    audio = tmp_path / "input.wav"
+    audio.touch()
+    with patch("subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=1, stderr=b"audio-separator error")
+        with pytest.raises(RuntimeError, match="audio-separator error"):
+            run_audio_separator(audio, tmp_path)
