@@ -1,11 +1,16 @@
 # server/routes/jobs.py
 import shutil
+import threading
+from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from .. import db
+from ..pipeline import run_job
 
 router = APIRouter()
+
+BASE_DIR = Path(__file__).parent.parent.parent
 
 SPLITTER_DEFS = [
     {"name": "demucs",          "label": "Demucs"},
@@ -31,7 +36,21 @@ def get_splitters():
 
 @router.post("/jobs", status_code=201)
 def create_job(body: JobCreate):
-    job_id = db.create_job(body.name, body.url, body.splitters, body.speed)
+    final_name = body.name
+    counter = 2
+    while (BASE_DIR / final_name).exists():
+        final_name = f"{body.name}-{counter}"
+        counter += 1
+
+    job_id = db.create_job(final_name, body.url, body.splitters, body.speed)
+
+    t = threading.Thread(
+        target=run_job,
+        args=(job_id, body.url, final_name, body.splitters, body.speed, BASE_DIR),
+        daemon=True,
+    )
+    t.start()
+
     job = db.get_job(job_id)
     return {
         **job.__dict__,
