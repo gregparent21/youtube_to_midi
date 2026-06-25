@@ -4,3 +4,10 @@ basic-pitch
 setuptools<81
 scikit-learn==1.5.1
 torchcodec
+fastapi
+uvicorn[standard]
+sse-starlette
+httpx
+pytest
+spleeter
+audio-separator
