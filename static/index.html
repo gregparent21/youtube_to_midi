@@ -144,14 +144,22 @@
 
       <!-- Global scrubber -->
       <div id="scrubber-bar">
-        <input type="range" min="0"
-               :max="$store.player.duration || 100"
-               :value="$store.player.playhead"
-               step="0.1"
-               @input="$store.player.seek($event.target.value)">
-        <div class="scrubber-times">
-          <span x-text="$store.player.formatTime($store.player.playhead)"></span>
-          <span x-text="$store.player.formatTime($store.player.duration)"></span>
+        <div class="scrubber-main">
+          <input type="range" min="0"
+                 :max="$store.player.duration || 100"
+                 :value="$store.player.playhead"
+                 step="0.1"
+                 @input="$store.player.seek($event.target.value)">
+          <div class="scrubber-times">
+            <span x-text="$store.player.formatTime($store.player.playhead)"></span>
+            <span x-text="$store.player.formatTime($store.player.duration)"></span>
+          </div>
+        </div>
+        <div class="volume-control">
+          <span class="volume-icon">🔊</span>
+          <input type="range" min="0" max="1" step="0.05"
+                 :value="$store.player.volume"
+                 @input="$store.player.setVolume($event.target.value)">
         </div>
       </div>
     </div>

@@ -197,6 +197,7 @@ body {
   border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
+  white-space: nowrap;
 }
 .stem-row .pick-btn:hover { background: #15803d; }
 .stem-row.selected-stem { background: #0f2a1a; border-radius: 6px; }
@@ -209,9 +210,16 @@ body {
   border-top: 1px solid #2e2e2e;
   padding: 12px 0;
   margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-#scrubber-bar input[type="range"] {
+.scrubber-main {
+  flex: 1;
+}
+
+.scrubber-main input[type="range"] {
   width: 100%;
   accent-color: #2563eb;
 }
@@ -222,6 +230,22 @@ body {
   font-size: 11px;
   color: #666;
   margin-top: 4px;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.volume-icon {
+  font-size: 14px;
+}
+
+.volume-control input[type="range"] {
+  width: 100px;
+  accent-color: #2563eb;
 }
 
 /* MIDI view */

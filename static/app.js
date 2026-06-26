@@ -5,6 +5,7 @@ document.addEventListener('alpine:init', () => {
   Alpine.store('player', {
     playhead: 0,
     duration: 0,
+    volume: 1,
     activeStemKey: null,
     paused: true,
     _elements: {},
@@ -52,6 +53,13 @@ document.addEventListener('alpine:init', () => {
       this.playhead = parseFloat(time);
       Object.values(this._elements).forEach(el => {
         el.currentTime = this.playhead;
+      });
+    },
+
+    setVolume(v) {
+      this.volume = parseFloat(v);
+      Object.values(this._elements).forEach(el => {
+        el.volume = this.volume;
       });
     },
 
