@@ -13,9 +13,38 @@
 </head>
 <body x-data="appRoot()" x-init="init()">
 
+  <!-- Landing page -->
+  <div id="landing-page" x-show="activeView === 'landing'">
+    <div id="landing-hero">
+      <div id="landing-logo">YT<span>2</span>MIDI</div>
+      <h1 id="landing-headline">Turn any YouTube video into MIDI</h1>
+      <p id="landing-subhead">Download the audio, split it into stems, and convert the part you want into a playable MIDI file — all in one pipeline.</p>
+      <button id="landing-cta" @click="getStarted()">Get Started</button>
+    </div>
+    <div id="landing-steps">
+      <div class="landing-step">
+        <div class="landing-step-icon">⬇</div>
+        <h3>Download</h3>
+        <p>yt-dlp pulls the audio track straight from a YouTube URL.</p>
+      </div>
+      <div class="landing-step">
+        <div class="landing-step-icon">🎚</div>
+        <h3>Separate</h3>
+        <p>Demucs isolates vocals, bass, drums, and other instruments into individual stems.</p>
+      </div>
+      <div class="landing-step">
+        <div class="landing-step-icon">🎹</div>
+        <h3>Convert</h3>
+        <p>Basic Pitch turns the stem you pick into a downloadable .mid file.</p>
+      </div>
+    </div>
+    <div id="landing-credits">Built on yt-dlp, Demucs, and Basic Pitch.</div>
+  </div>
+
   <!-- Sidebar -->
-  <aside id="sidebar">
+  <aside id="sidebar" x-show="activeView !== 'landing'">
     <div id="sidebar-header">
+      <div id="sidebar-logo" @click="goHome()" title="Back to home">YT<span>2</span>MIDI</div>
       <button @click="newJob()">+ New Job</button>
     </div>
     <div id="job-list">
@@ -30,7 +59,7 @@
   </aside>
 
   <!-- Main panel -->
-  <main id="main">
+  <main id="main" x-show="activeView !== 'landing'">
 
     <!-- Form view -->
     <div x-show="activeView === 'form'">

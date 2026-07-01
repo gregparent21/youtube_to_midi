@@ -76,7 +76,7 @@ function appRoot() {
     // Sidebar
     jobs: [],
     activeJobId: null,
-    activeView: 'form',  // 'form' | 'progress' | 'stems' | 'midi'
+    activeView: 'landing',  // 'landing' | 'form' | 'progress' | 'stems' | 'midi'
 
     // Available splitters from server
     availableSplitters: [],
@@ -146,6 +146,19 @@ function appRoot() {
       this.activeView = 'form';
       this.convertError = null;
       if (this._evtSource) { this._evtSource.close(); this._evtSource = null; }
+    },
+
+    getStarted() {
+      if (this.jobs.length > 0) {
+        this.selectJob(this.jobs[0]);
+      } else {
+        this.newJob();
+      }
+    },
+
+    goHome() {
+      if (this._evtSource) { this._evtSource.close(); this._evtSource = null; }
+      this.activeView = 'landing';
     },
 
     _populateStems(stemsArray) {

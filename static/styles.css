@@ -30,6 +30,90 @@ body {
   color: var(--text-primary);
 }
 
+/* Landing page */
+#landing-page {
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 24px 48px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.15), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(236, 72, 153, 0.12), transparent 40%),
+    var(--bg-page);
+}
+
+#landing-hero { max-width: 640px; }
+
+#landing-logo {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+#landing-logo span { color: transparent; background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; }
+
+#landing-headline {
+  font-family: var(--font-heading);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+#landing-subhead {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+#landing-cta {
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
+}
+#landing-cta:hover { filter: brightness(1.08); }
+
+#landing-steps {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 900px;
+  margin-top: 64px;
+}
+
+.landing-step {
+  width: 240px;
+  padding: 24px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.landing-step-icon { font-size: 28px; margin-bottom: 12px; }
+.landing-step h3 { font-size: 16px; margin-bottom: 8px; }
+.landing-step p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+#landing-credits {
+  margin-top: 48px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 /* Sidebar */
 #sidebar {
   width: 240px;
@@ -43,8 +127,21 @@ body {
 
 #sidebar-header {
   padding: 16px;
-  border-bottom: 1px solid #2e2e2e;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
+
+#sidebar-logo {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+#sidebar-logo span { color: transparent; background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; }
 
 #sidebar-header button {
   width: 100%;
