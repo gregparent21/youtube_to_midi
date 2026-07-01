@@ -200,8 +200,9 @@
 
     <!-- MIDI download view -->
     <div x-show="activeView === 'midi'">
+      <div class="midi-success-icon">✓</div>
       <h2>MIDI Ready</h2>
-      <p style="color: #aaa; font-size: 14px; margin-bottom: 16px;">
+      <p class="midi-subtext">
         Basic Pitch conversion complete. Download your files below.
       </p>
       <div class="download-links">
@@ -214,7 +215,7 @@
           ⬇ Download Stem WAV
         </a>
       </div>
-      <div style="margin-top: 32px;">
+      <div class="midi-back-row">
         <button class="btn-primary" @click="activeView = 'stems'">← Back to stems</button>
       </div>
     </div>

@@ -465,17 +465,35 @@ body {
 }
 
 /* MIDI view */
+.midi-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--success);
+  border: 2px solid var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.midi-subtext { color: var(--text-muted); font-size: 14px; margin-bottom: 16px; }
+.midi-back-row { margin-top: 32px; }
+
 .download-links { display: flex; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
 .download-links a {
   padding: 10px 20px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   text-decoration: none;
   font-size: 14px;
+  font-weight: 600;
 }
-.dl-midi { background: #7c3aed; color: white; }
-.dl-midi:hover { background: #6d28d9; }
-.dl-wav  { background: #374151; color: white; }
-.dl-wav:hover  { background: #1f2937; }
+.dl-midi { background: var(--accent-gradient); color: white; }
+.dl-midi:hover { filter: brightness(1.08); }
+.dl-wav  { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary); }
+.dl-wav:hover  { border-color: var(--accent-1); }
 
 h1, h2, h3 { font-family: var(--font-heading); }
 h1, h2 { margin-bottom: 24px; }
