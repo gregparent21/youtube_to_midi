@@ -118,7 +118,7 @@
       <ul class="step-list">
         <template x-for="step in steps" :key="step.id">
           <li class="step-item">
-            <span class="step-icon" x-text="stepIcon(step.status)"></span>
+            <span class="step-icon" :class="'status-' + step.status" x-text="stepIcon(step.status)"></span>
             <div>
               <span x-text="step.label"></span>
               <div x-show="step.error" class="step-error"
