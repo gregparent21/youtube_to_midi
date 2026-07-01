@@ -151,7 +151,8 @@
 
               <span class="splitter-label" x-text="row.splitter"></span>
 
-              <button @click="$store.player.toggle(row.splitter + ':' + row.stemType)"
+              <button class="play-btn"
+                      @click="$store.player.toggle(row.splitter + ':' + row.stemType)"
                       :title="($store.player.activeStemKey === row.splitter + ':' + row.stemType && !$store.player.paused) ? 'Pause' : 'Play'">
                 <span x-text="($store.player.activeStemKey === row.splitter + ':' + row.stemType && !$store.player.paused) ? '⏸' : '▶'"></span>
               </button>

@@ -382,7 +382,7 @@ body {
   text-align: center;
 }
 
-.stem-row button {
+.stem-row .play-btn {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -394,7 +394,7 @@ body {
   flex-shrink: 0;
 }
 
-.stem-row button:hover { filter: brightness(1.08); }
+.stem-row .play-btn:hover { filter: brightness(1.08); }
 
 .stem-row .time-display {
   font-size: 12px;
