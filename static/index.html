@@ -52,7 +52,7 @@
         <div class="job-item" :class="{ active: job.id === activeJobId }"
              @click="selectJob(job)">
           <span class="job-name" x-text="job.name"></span>
-          <span class="status-icon" x-text="statusIcon(job.status)"></span>
+          <span class="status-icon" :class="'status-' + job.status" x-text="statusIcon(job.status)"></span>
         </div>
       </template>
     </div>

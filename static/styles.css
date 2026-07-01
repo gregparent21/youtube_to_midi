@@ -118,8 +118,8 @@ body {
 #sidebar {
   width: 240px;
   min-width: 240px;
-  background: #1a1a1a;
-  border-right: 1px solid #2e2e2e;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -145,16 +145,17 @@ body {
 
 #sidebar-header button {
   width: 100%;
-  padding: 8px;
-  background: #2563eb;
+  padding: 10px;
+  background: var(--accent-gradient);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius);
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
 }
 
-#sidebar-header button:hover { background: #1d4ed8; }
+#sidebar-header button:hover { filter: brightness(1.08); }
 
 #job-list {
   flex: 1;
@@ -167,14 +168,18 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   cursor: pointer;
   font-size: 13px;
   gap: 8px;
+  border-left: 3px solid transparent;
 }
 
-.job-item:hover { background: #252525; }
-.job-item.active { background: #1e3a5f; }
+.job-item:hover { background: var(--bg-elevated); }
+.job-item.active {
+  background: var(--bg-elevated);
+  border-left: 3px solid var(--accent-1);
+}
 
 .job-name {
   flex: 1;
@@ -184,6 +189,10 @@ body {
 }
 
 .status-icon { font-size: 14px; flex-shrink: 0; }
+.status-icon.status-pending { color: var(--text-muted); }
+.status-icon.status-running { color: var(--accent-cyan); }
+.status-icon.status-completed { color: var(--success); }
+.status-icon.status-failed { color: var(--error); }
 
 /* Main panel */
 #main {
