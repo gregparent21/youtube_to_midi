@@ -1,3 +1,7 @@
 .superpowers/
 .env
 .env.local
+__pycache__/
+*.pyc
+jobs.db
+pretrained_models/
