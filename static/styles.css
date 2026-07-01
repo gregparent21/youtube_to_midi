@@ -1,13 +1,33 @@
 /* static/styles.css */
+:root {
+  --bg-page: #0b0b0f;
+  --bg-panel: #15151c;
+  --bg-elevated: #1c1c26;
+  --border: #2a2a35;
+  --text-primary: #e8e8ec;
+  --text-muted: #9a9aa5;
+  --accent-1: #8b5cf6;
+  --accent-2: #ec4899;
+  --accent-gradient: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  --accent-cyan: #22d3ee;
+  --success: #16a34a;
+  --success-hover: #15803d;
+  --error: #f87171;
+  --warning: #f59e0b;
+  --radius: 10px;
+  --font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-body);
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background: #0f0f0f;
-  color: #e0e0e0;
+  background: var(--bg-page);
+  color: var(--text-primary);
 }
 
 /* Sidebar */
@@ -261,5 +281,6 @@ body {
 .dl-wav  { background: #374151; color: white; }
 .dl-wav:hover  { background: #1f2937; }
 
+h1, h2, h3 { font-family: var(--font-heading); }
 h1, h2 { margin-bottom: 24px; }
-h2 { font-size: 18px; }
+h2 { font-size: 20px; font-weight: 600; }
